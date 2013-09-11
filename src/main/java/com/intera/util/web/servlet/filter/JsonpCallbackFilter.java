@@ -1,17 +1,16 @@
 package com.intera.util.web.servlet.filter;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,21 +23,21 @@ public class JsonpCallbackFilter implements Filter {
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         @SuppressWarnings("unchecked")
-		Map<String, String[]> parms = httpRequest.getParameterMap();
+        Map<String, String[]> parms = httpRequest.getParameterMap();
 
         String callback = null;
         if(parms.containsKey("callback") && null != (callback = parms.get("callback")[0])) {
             if(log.isDebugEnabled())
                 log.debug("Wrapping response with JSONP callback '" + callback + "'");
-            OutputStream out = httpResponse.getOutputStream();
-            out.write(new String(callback + "(").getBytes());
-            chain.doFilter(request, httpResponse);
-            out.write(new String(");").getBytes());
-            
-            httpResponse.setContentType("text/javascript;charset=UTF-8");
+
+            ServletOutputStream out = response.getOutputStream();
+            out.print(callback + "(");
+            chain.doFilter(request, response);
+            out.print(");");
+
+            response.setContentType("text/javascript;charset=UTF-8");
         } else {
             chain.doFilter(request, response);
         }
