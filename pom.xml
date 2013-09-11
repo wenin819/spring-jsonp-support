@@ -3,7 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.intera.util</groupId>
 	<artifactId>spring-jsonp-support</artifactId>
-	<version>0.0.1</version>
+	<packaging>war</packaging>
+	<version>0.0.2</version>
 
 	<properties>
 		<spring.version>3.1.4.RELEASE</spring.version>
