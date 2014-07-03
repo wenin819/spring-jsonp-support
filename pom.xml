@@ -81,9 +81,6 @@
 						<contextPath>/jsonp</contextPath>
 					</webAppConfig>
 					<webAppSourceDirectory>src/main/webapp</webAppSourceDirectory>
-					<classesDirectories>
-						<classesDirectory>target/classes</classesDirectory>
-					</classesDirectories>
 					<scanIntervalSeconds>12</scanIntervalSeconds>
 					<connectors>
 						<connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">

@@ -1,16 +1,18 @@
 package com.intera.util.web.servlet.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +31,12 @@ public class JsonpCallbackFilter implements Filter {
 
         String callback = null;
         if(parms.containsKey("callback") && null != (callback = parms.get("callback")[0])) {
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug("Wrapping response with JSONP callback '" + callback + "'");
+            }
+            response = new MultiOutputHttpServletResponse((HttpServletResponse) response);
 
-            ServletOutputStream out = response.getOutputStream();
+            PrintWriter out = response.getWriter();
             out.print(callback + "(");
             chain.doFilter(request, response);
             out.print(");");
@@ -44,4 +48,16 @@ public class JsonpCallbackFilter implements Filter {
     }
 
     public void destroy() {}
+
+    public static class MultiOutputHttpServletResponse extends HttpServletResponseWrapper {
+
+        public MultiOutputHttpServletResponse(HttpServletResponse response) {
+            super(response);
+        }
+
+        @Override
+        public PrintWriter getWriter() throws IOException {
+            return new PrintWriter(getOutputStream());
+        }
+    }
 }
